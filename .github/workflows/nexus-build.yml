@@ -1,3 +1,4 @@
+
 name: NEXUS VPN Build
 
 on:
@@ -29,15 +30,23 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          accept-android-sdk-licenses: false
+          log-accepted-android-sdk-licenses: false
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses
 
       - name: Install Android SDK and NDK
         run: |
-          sdkmanager "platforms;android-37" "build-tools;37.0.0" "ndk;30.0.16248370"
+          sdkmanager \
+            "platforms;android-37" \
+            "build-tools;37.0.0" \
+            "ndk;30.0.16248370"
 
       - name: Build HEV tunnel libraries
-        env:
-          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/30.0.16248370
         run: |
+          export NDK_HOME="$ANDROID_HOME/ndk/30.0.16248370"
           chmod +x compile-hevtun.sh
           bash compile-hevtun.sh
           mkdir -p V2rayNG/app/libs
