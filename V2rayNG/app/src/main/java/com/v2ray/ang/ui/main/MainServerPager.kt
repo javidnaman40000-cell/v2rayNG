@@ -342,7 +342,6 @@ private fun ServerItemColumn(
 }
 
 @Composable
-@Composable
 private fun ServerListItem(
     row: ServerRowUiModel,
     isSelected: Boolean,
