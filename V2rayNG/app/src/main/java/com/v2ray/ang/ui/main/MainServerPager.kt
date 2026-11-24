@@ -342,6 +342,7 @@ private fun ServerItemColumn(
 }
 
 @Composable
+@Composable
 private fun ServerListItem(
     row: ServerRowUiModel,
     isSelected: Boolean,
@@ -353,116 +354,186 @@ private fun ServerListItem(
     } else {
         stringResource(R.string.server_test_delay_value, row.testDelayMillis)
     }
+
     val selectedStateDescription = if (isSelected) {
         stringResource(R.string.acc_selected_server)
     } else {
         null
     }
+
+    val cardBackground = if (isSelected) {
+        androidx.compose.ui.graphics.Color(0xFF102B3B)
+    } else {
+        androidx.compose.ui.graphics.Color(0xFF0B1928)
+    }
+
+    val borderColor = if (isSelected) {
+        androidx.compose.ui.graphics.Color(0xFF00D9FF)
+    } else {
+        androidx.compose.ui.graphics.Color(0xFF20394D)
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .semantics {
-                if (selectedStateDescription != null) {
-                    stateDescription = selectedStateDescription
-                }
-            }
+            .padding(horizontal = 10.dp, vertical = 5.dp)
+            .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+            .background(cardBackground)
+            .then(
+                Modifier
+                    .semantics {
+                        if (selectedStateDescription != null) {
+                            stateDescription = selectedStateDescription
+                        }
+                    }
+            )
             .clickable { actions.select(row.guid) }
+            .padding(start = 10.dp, end = 8.dp, top = 9.dp, bottom = 9.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
-            Modifier
-                .width(10.dp)
-                .fillMaxHeight()
-        ) {
-            if (isSelected) {
-                Row {
-                    Spacer(Modifier.width(6.dp))
-                    Box(
-                        Modifier
-                            .width(4.dp)
-                            .fillMaxHeight()
-                            .padding(vertical = 10.dp)
-                            .background(MaterialTheme.colorScheme.primary)
-                    )
-                }
-            }
-        }
+            modifier = Modifier
+                .width(4.dp)
+                .height(58.dp)
+                .clip(CircleShape)
+                .background(borderColor)
+        )
 
         Column(
-            Modifier
+            modifier = Modifier
                 .weight(1f)
-                .padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
+                .padding(start = 11.dp, end = 2.dp)
         ) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(row.remarks, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge.copy(lineBreak = LineBreak.Paragraph), maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = row.remarks,
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        lineBreak = LineBreak.Paragraph
+                    ),
+                    color = androidx.compose.ui.graphics.Color(0xFFEAF7FF),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
                 if (doubleColumnDisplay) {
-                    IconButton(onClick = { actions.more(row.guid, row.profile) }, Modifier.size(36.dp)) {
+                    IconButton(
+                        onClick = { actions.more(row.guid, row.profile) },
+                        modifier = Modifier.size(36.dp)
+                    ) {
                         Icon(
                             painterResource(R.drawable.ic_more_vert_24dp),
                             stringResource(R.string.acc_more),
-                            Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
+                            tint = androidx.compose.ui.graphics.Color(0xFF00D9FF)
                         )
                     }
                 } else {
-                    IconButton(onClick = { actions.share(row.guid, row.profile) }, Modifier.size(36.dp)) {
+                    IconButton(
+                        onClick = { actions.share(row.guid, row.profile) },
+                        modifier = Modifier.size(34.dp)
+                    ) {
                         Icon(
                             painterResource(R.drawable.ic_share_24dp),
                             stringResource(R.string.title_configuration_share),
-                            Modifier.size(24.dp)
+                            modifier = Modifier.size(21.dp),
+                            tint = androidx.compose.ui.graphics.Color(0xFF91B8D0)
                         )
                     }
-                    IconButton(onClick = { actions.edit(row.guid, row.profile) }, Modifier.size(36.dp)) {
+                    IconButton(
+                        onClick = { actions.edit(row.guid, row.profile) },
+                        modifier = Modifier.size(34.dp)
+                    ) {
                         Icon(
                             painterResource(R.drawable.ic_edit_24dp),
                             stringResource(R.string.acc_edit),
-                            Modifier.size(24.dp)
+                            modifier = Modifier.size(21.dp),
+                            tint = androidx.compose.ui.graphics.Color(0xFF00D9FF)
                         )
                     }
-                    IconButton(onClick = { actions.remove(row.guid, row.remarks) }, Modifier.size(36.dp)) {
+                    IconButton(
+                        onClick = { actions.remove(row.guid, row.remarks) },
+                        modifier = Modifier.size(34.dp)
+                    ) {
                         Icon(
                             painterResource(R.drawable.ic_delete_24dp),
                             stringResource(R.string.acc_delete),
-                            Modifier.size(24.dp)
+                            modifier = Modifier.size(21.dp),
+                            tint = androidx.compose.ui.graphics.Color(0xFFFF647C)
                         )
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(6.dp))
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+
+            Spacer(modifier = Modifier.height(7.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 if (row.subscriptionBadge.isNotBlank()) {
                     Box(
-                        Modifier
-                            .size(24.dp)
+                        modifier = Modifier
+                            .size(23.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)), Alignment.Center
+                            .background(
+                                androidx.compose.ui.graphics.Color(0xFF00D9FF)
+                                    .copy(alpha = 0.16f)
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(row.subscriptionBadge.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            text = row.subscriptionBadge.uppercase(),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = androidx.compose.ui.graphics.Color(0xFF00D9FF)
+                        )
                     }
+                    Spacer(modifier = Modifier.width(7.dp))
                 }
+
                 Text(
-                    row.statistics,
-                    Modifier.weight(1f),
+                    text = row.statistics,
+                    modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = androidx.compose.ui.graphics.Color(0xFF91A8BE),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            Spacer(modifier = Modifier.height(6.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+
+            Spacer(modifier = Modifier.height(7.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    row.typeDescription,
+                    text = row.typeDescription,
                     modifier = Modifier.weight(1f, fill = false),
                     style = MaterialTheme.typography.bodySmall,
-                    color = colorConfigType,
+                    color = androidx.compose.ui.graphics.Color(0xFF8CB7D0),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+
                 Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
-                    testResult,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (row.testDelayMillis < 0L) colorPingRed else colorPing,
+                    text = testResult,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = if (row.testDelayMillis < 0L) {
+                        colorPingRed
+                    } else {
+                        colorPing
+                    },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
