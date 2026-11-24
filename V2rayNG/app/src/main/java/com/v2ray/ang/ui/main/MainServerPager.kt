@@ -361,14 +361,14 @@ private fun ServerListItem(
         null
     }
 
+    val cyan = androidx.compose.ui.graphics.Color(0xFF00D9FF)
     val cardBackground = if (isSelected) {
         androidx.compose.ui.graphics.Color(0xFF102B3B)
     } else {
         androidx.compose.ui.graphics.Color(0xFF0B1928)
     }
-
     val borderColor = if (isSelected) {
-        androidx.compose.ui.graphics.Color(0xFF00D9FF)
+        cyan
     } else {
         androidx.compose.ui.graphics.Color(0xFF20394D)
     }
@@ -380,15 +380,14 @@ private fun ServerListItem(
             .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
             .background(cardBackground)
             .then(
-                Modifier
-                    .semantics {
-                        if (selectedStateDescription != null) {
-                            stateDescription = selectedStateDescription
-                        }
+                Modifier.semantics {
+                    if (selectedStateDescription != null) {
+                        stateDescription = selectedStateDescription
                     }
+                }
             )
             .clickable { actions.select(row.guid) }
-            .padding(start = 10.dp, end = 8.dp, top = 9.dp, bottom = 9.dp),
+            .padding(start = 10.dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -412,13 +411,29 @@ private fun ServerListItem(
                     text = row.remarks,
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Bold,
                         lineBreak = LineBreak.Paragraph
                     ),
                     color = androidx.compose.ui.graphics.Color(0xFFEAF7FF),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                if (isSelected) {
+                    Box(
+                        modifier = Modifier
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(20.dp))
+                            .background(cyan.copy(alpha = 0.14f))
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "ACTIVE",
+                            color = cyan,
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
+                }
 
                 if (doubleColumnDisplay) {
                     IconButton(
@@ -429,7 +444,7 @@ private fun ServerListItem(
                             painterResource(R.drawable.ic_more_vert_24dp),
                             stringResource(R.string.acc_more),
                             modifier = Modifier.size(24.dp),
-                            tint = androidx.compose.ui.graphics.Color(0xFF00D9FF)
+                            tint = cyan
                         )
                     }
                 } else {
@@ -452,7 +467,7 @@ private fun ServerListItem(
                             painterResource(R.drawable.ic_edit_24dp),
                             stringResource(R.string.acc_edit),
                             modifier = Modifier.size(21.dp),
-                            tint = androidx.compose.ui.graphics.Color(0xFF00D9FF)
+                            tint = cyan
                         )
                     }
                     IconButton(
@@ -480,17 +495,14 @@ private fun ServerListItem(
                         modifier = Modifier
                             .size(23.dp)
                             .clip(CircleShape)
-                            .background(
-                                androidx.compose.ui.graphics.Color(0xFF00D9FF)
-                                    .copy(alpha = 0.16f)
-                            ),
+                            .background(cyan.copy(alpha = 0.16f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = row.subscriptionBadge.uppercase(),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            color = androidx.compose.ui.graphics.Color(0xFF00D9FF)
+                            color = cyan
                         )
                     }
                     Spacer(modifier = Modifier.width(7.dp))
@@ -524,19 +536,27 @@ private fun ServerListItem(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                Text(
-                    text = testResult,
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = if (row.testDelayMillis < 0L) {
-                        colorPingRed
-                    } else {
-                        colorPing
-                    },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if (testResult.isNotBlank()) {
+                    Box(
+                        modifier = Modifier
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(20.dp))
+                            .background(
+                                (if (row.testDelayMillis < 0L) colorPingRed else colorPing)
+                                    .copy(alpha = 0.14f)
+                            )
+                            .padding(horizontal = 9.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = testResult,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = if (row.testDelayMillis < 0L) colorPingRed else colorPing,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             }
         }
     }
