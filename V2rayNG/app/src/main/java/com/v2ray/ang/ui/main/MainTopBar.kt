@@ -21,7 +21,7 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.verticalScrollbar
 
 private val NexusBlue = Color(0xFF00D9FF)
-private val NexusDark = Color(0xFF07111F)
+private val NexusDark = Color(0xFF0B1B2D)
 private val NexusMuted = Color(0xFF91A8BE)
 
 @Composable

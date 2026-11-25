@@ -63,14 +63,16 @@ internal fun serverMenuActions(
 fun ImportMenuContent(onAction: (MainAction) -> Unit) = AppDropdownMenuItems(
     items = ImportMenuAction.entries,
     labelRes = { it.labelRes },
-    onSelected = { onAction(it.action) }
+    onSelected = { onAction(it.action) },
+    textColor = androidx.compose.ui.graphics.Color(0xFFEAF7FF)
 )
 
 @Composable
 fun MoreMenuContent(onSelected: (MainMoreMenuAction) -> Unit) = AppDropdownMenuItems(
     items = MainMoreMenuAction.entries,
     labelRes = { it.labelRes },
-    onSelected = onSelected
+    onSelected = onSelected,
+    textColor = androidx.compose.ui.graphics.Color(0xFFEAF7FF)
 )
 
 @Composable
