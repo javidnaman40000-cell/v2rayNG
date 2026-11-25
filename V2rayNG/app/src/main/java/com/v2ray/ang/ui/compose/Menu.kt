@@ -11,8 +11,8 @@ import androidx.compose.ui.text.font.FontWeight
 fun <T> AppDropdownMenuItems(
     items: List<T>,
     labelRes: (T) -> Int,
-    onSelected: (T) -> Unit,
-    textColor: Color = Color.Unspecified
+    textColor: Color = Color.Unspecified,
+    onSelected: (T) -> Unit
 ) {
     items.forEach { item ->
         DropdownMenuItem(
