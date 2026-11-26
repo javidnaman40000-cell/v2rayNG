@@ -109,6 +109,8 @@ class MainViewModel(
 
     private val testRequests = MainTestRequests()
     private var bulkTestJob: Job? = null
+    private var autoSelectRequestId: String? = null
+    private var autoSelectServerGuids: Set<String> = emptySet()
 
     private val initialPageReady = CompletableDeferred<Unit>()
 
@@ -279,6 +281,7 @@ class MainViewModel(
             MainAction.RefreshGroups -> setupGroupTab(forceRefresh = true)
             MainAction.TestAllServers -> testAllRealPing(true)
             MainAction.TestRealAllServers -> testAllRealPing()
+            MainAction.AutoSelectFastest -> testAllRealPing(autoSelect = true)
             MainAction.CancelTesting -> cancelAllPing()
             MainAction.RemoveAllServers -> removeAllServerAsync()
             MainAction.RemoveDuplicateServers -> removeDuplicateServerAsync()
@@ -816,6 +819,8 @@ class MainViewModel(
 
     // ---------- Testing ----------
     fun cancelAllPing() {
+        autoSelectRequestId = null
+        autoSelectServerGuids = emptySet()
         bulkTestJob?.cancel()
         bulkTestJob = null
         testRequests.cancelBulk()
@@ -835,7 +840,7 @@ class MainViewModel(
         }
     }
 
-    fun testAllRealPing(onlyTcp: Boolean = false) {
+    fun testAllRealPing(onlyTcp: Boolean = false, autoSelect: Boolean = false) {
         cancelAllPing()
         val groupId = uiState.value.selectedGroupId
         val servers = currentServers()
@@ -856,6 +861,8 @@ class MainViewModel(
             )
         }
         val request = testRequests.beginBulk(groupId)
+        autoSelectRequestId = if (autoSelect) request.id else null
+        autoSelectServerGuids = if (autoSelect) serverGuids.toSet() else emptySet()
         val message = TestServiceMessage(
             key = AppConfig.MSG_MEASURE_CONFIG_START,
             subscriptionId = groupId,
@@ -898,11 +905,40 @@ class MainViewModel(
     }
 
     private fun onTestsFinished(requestId: String) {
-        if (testRequests.completeBulk(requestId) == null) return
+        val request = testRequests.completeBulk(requestId) ?: return
+        val shouldAutoSelect = autoSelectRequestId == requestId
+        val candidateGuids =
+            if (shouldAutoSelect) autoSelectServerGuids else emptySet()
+
+        autoSelectRequestId = null
+        autoSelectServerGuids = emptySet()
+
         resetTestStatus()
         viewModelScope.launch(ioDispatcher) {
-            cacheMutex.withLock { groupDataCache.clear() }
-            reloadAllGroups(_uiState.value.groups.map { it.id })
+            cacheMutex.withLock {
+                groupDataCache.remove(request.groupId)
+            }
+
+            val refreshed = loadGroup(request.groupId, forceRefresh = true)
+            updateGroupUi(request.groupId, refreshed)
+
+            if (shouldAutoSelect) {
+                val fastest = refreshed.asSequence()
+                    .filter {
+                        it.guid in candidateGuids && it.testDelayMillis > 0L
+                    }
+                    .minByOrNull { it.testDelayMillis }
+
+                if (fastest != null) {
+                    withContext(Dispatchers.Main.immediate) {
+                        updateSelectedGuid(fastest.guid)
+                    }
+                }
+            }
+
+            reloadAllGroups(
+                _uiState.value.groups.map { it.id }.filter { it != request.groupId }
+            )
         }
     }
 
