@@ -842,12 +842,16 @@ class MainViewModel(
 
     fun testAllRealPing(onlyTcp: Boolean = false, autoSelect: Boolean = false) {
         cancelAllPing()
-        val groupId = uiState.value.selectedGroupId
-        val servers = currentServers()
-        if (servers.isEmpty()) {
+        val groupId = if (autoSelect) "" else uiState.value.selectedGroupId
+        val servers = if (autoSelect) emptyList() else currentServers()
+        val serverGuids = if (autoSelect) {
+            dataSource.getServerGuidList("")
+        } else {
+            servers.map { it.guid }
+        }
+        if (serverGuids.isEmpty()) {
             return
         }
-        val serverGuids = servers.map { it.guid }
         mutableServerGroupState(groupId).update { current ->
             current.copy(
                 servers = current.servers.map { server ->
